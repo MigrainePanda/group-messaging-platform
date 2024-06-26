@@ -1,0 +1,7 @@
+.venv
+virtualenv
+
+env
+__pycache__
+instance
+project.db
