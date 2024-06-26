@@ -1,15 +1,21 @@
-import json
-from base64 import urlsafe_b64encode
+import json, ast
 import hmac
+from base64 import urlsafe_b64encode, urlsafe_b64decode
 from hashlib import sha256
 
-from flask import Blueprint, request, url_for, render_template, redirect
+from dotenv import load_dotenv
+import os
+from datetime import datetime, timezone
+
+from flask import Blueprint, request, url_for, render_template, redirect, make_response
 
 from application import engine
 from application.models import User
 
 from sqlalchemy.orm import Session
 from sqlalchemy import select
+
+load_dotenv()
 
 users_bp = Blueprint("users", __name__, url_prefix="/users")
 
@@ -49,11 +55,17 @@ def create_user():
 @users_bp.route("/login", methods=["GET", "POST"])
 def user_login():
     if request.method == "GET":
-        
-        # check cookies for token
+        if 'jwt' in request.cookies:
+            # should check valid secret key first before running below as malicious data could be uploaded
+            data = "{" + urlsafe_b64decode(request.cookies['jwt'].split(".")[1] + "==").decode("utf-8") + "}"
+            data = json.loads(data)
+            print(data)
+            
+            return redirect(url_for('home_page'))
         
         email = request.args.get("email")
-        return render_template("login.html", email=email)
+        error = request.args.get("error")
+        return render_template("login.html", email=email, error=error)
     
     if request.method == "POST":        
         email = request.form["email"]
@@ -63,86 +75,29 @@ def user_login():
             if not user: return redirect(url_for("users.user_login", error=1))
             if user.password != password: return redirect(url_for("users.user_login", error=2, email=email))
             user = user.__dict__
-
-        print(user)
-        
-        header = {
-            "alg": "HS256",
-            "typ": "JWT",
-        }
-        
-        payload = {
-            "sub": user["email"],
-            "iat": 5516239024,
-            # "admin": False,
-            # "exp": new date
-        }
         
         encoding = 'utf-8'
-        encoded_header = urlsafe_b64encode(str(header).encode(encoding))
-        encoded_payload = urlsafe_b64encode(str(payload).encode(encoding))
+        secret_key = os.getenv('SECRET_KEY')
+        iat_time = datetime.now(timezone.utc).timestamp()
+        exp_time = iat_time + 6048000
         
-        signature_payload = f'{encoded_header}.{encoded_payload}'
+        header = '{"alg":"HS256","typ":"JWT"}'
+        payload = f'"id":"{user["id"]}","iat":{iat_time},"exp":{exp_time}'
         
-        secret_key = b'your-256-bit-secret'
-        
-        signature = hmac.new(
-            secret_key,
-            msg = signature_payload.encode(encoding),
-            digestmod=sha256
-        ).digest()
-        
-        encoded_signature = urlsafe_b64encode(str(signature).encode(encoding))
-        
-        jwt_token = f'{signature_payload}.{encoded_signature}'
-        
-        print(jwt_token)
-        
-        resp = {
-            "token": jwt_token
-        }
-        
-        
-        
-        
-        
-        
-        # encoded_header = urlsafe_b64encode(json.dumps(header).encode('utf-8'))
-        # encoded_header_urlsafe_bytes = urlsafe_b64encode(json.dumps(header).encode('utf-8'))
-        # encoded_header_urlsafe_str = str(encoded_header_urlsafe_bytes, "utf-8")
+        encoded_header = urlsafe_b64encode(bytes(header, encoding)).decode().replace("=", "")
+        encoded_payload = urlsafe_b64encode(bytes(payload, encoding)).decode().replace("=", "")
 
+        signature = hmac.new(bytes(secret_key, encoding), bytes(encoded_header + '.' + encoded_payload, encoding), digestmod=sha256).digest()
+        encoded_signature = urlsafe_b64encode(signature).decode().replace("=", "")
+        
+        jwt = encoded_header + '.' + encoded_payload + '.' + encoded_signature
+        
+        response = make_response(render_template("index.html", cookies=request.cookies))
+        response.set_cookie("jwt", jwt)
 
-        # encoded_payload_urlsafe_bytes = urlsafe_b64encode(json.dumps(payload).encode('utf-8'))
-        # encoded_payload_urlsafe_str = str(encoded_payload_urlsafe_bytes, "utf-8")
-        
-        
-        # API_SECRET = 892374928347928347283473
-        # message = f'{encoded_header_urlsafe_str} {encoded_payload_urlsafe_str} {API_SECRET}'
-        # signature = hmac.new(
-        #     str(API_SECRET),
-        #     msg=message,
-        #     digestmod=sha256
-        # ).hexdigest().upper()
-        
-        
-        
-        # signature = HMACSHA256(  base64UrlEncode(header) + "." +   base64UrlEncode(payload),   secret)
-        # sha256(input_.encode('utf-8')).hexdigest()
-        # signature = sha256(encoded_header + encoded_payload)
-        
-        # print(encoded_header)
-        # print(encoded_payload)
-        # print(signature.hexdigest())
-        
-        # return redirect(url_for("set_cookie", ))
-
-        return redirect(url_for("home_page"))
+        return response
             
     
     
-    
-    # from hashlib import sha256
-    # input_ = input('Enter something: ')
-    # print(sha256(input_.encode('utf-8')).hexdigest())
     
     

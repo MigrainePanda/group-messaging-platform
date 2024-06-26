@@ -1,7 +1,9 @@
-.venv
-virtualenv
+Include
+Lib
+Scripts
+pyvenv.cfg
 
-env
+.env
 __pycache__
 instance
 project.db

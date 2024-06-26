@@ -1,49 +1,48 @@
-import json
-from base64 import urlsafe_b64encode
+import base64
 import hmac
 from hashlib import sha256
 
-
+encoding = 'utf-8'
 header = '{"alg":"HS256","typ":"JWT"}'
-
 payload = '{"sub":"rizzlyogawabear@gmail.com","iat":5516239024}'
 
-encoding = 'utf-8'
-encoded_header = urlsafe_b64encode(bytes(str(header), encoding)).decode().replace("=", "")
-encoded_payload = urlsafe_b64encode(bytes(str(header), encoding)).decode().replace("=", "")
+encoded_header = base64.urlsafe_b64encode(bytes(header, encoding)).decode().replace("=", "")
+encoded_payload = base64.urlsafe_b64encode(bytes(payload, encoding)).decode().replace("=", "")
+# print(header)
+# print(payload)
 
-signature_payload = f'{encoded_header}.{encoded_payload}'
 
-secret_key = 'your-256-bit-secret'
 
-signature = hmac.new(
-    bytes(secret_key, encoding),
-    msg = bytes(signature_payload, encoding),
-    digestmod=sha256
-).digest()
+secret_key = 'your-secret-key-is-not-cool'
+encoded_secret_key = base64.urlsafe_b64encode(bytes(secret_key, encoding)).decode().replace("=", "")
 
-sigb64 = urlsafe_b64encode(bytes(signature)).decode().replace("=", "")
 
-token = encoded_header + '.' + encoded_payload + '.' + sigb64
+signature = hmac.new(bytes(encoded_secret_key, encoding), bytes(encoded_header + '.' + encoded_payload, encoding), digestmod=sha256).digest()
+encoded_signature = base64.urlsafe_b64encode(signature).decode().replace("=", "")
+
+
+
+
+
+token = encoded_header + '.' + encoded_payload + '.' + encoded_signature
 print("\n\n\n\n", token)
 
 
-correct = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJyaXp6bHlvZ2F3YWJlYXJAZ21haWwuY29tIiwiaWF0Ijo1NTE2MjM5MDI0fQ.GHhMbNh_-p7gxQe14bUzEGObJ03LUkCk2LW9V6MfdHU"
+# token = ""
+correct = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJyaXp6bHlvZ2F3YWJlYXJAZ21haWwuY29tIiwiaWF0Ijo1NTE2MjM5MDI0fQ.RcnAucyLX5WW-Grc_89-9BS8ZDbRBDzbAR6mE_YYwgw"
 if correct == token:
     print("\n\n\n\nyeayeayaeyaey")
-elif token == "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJyaXp6bHlvZ2F3YWJlYXJAZ21haWwuY29tIiwiaWF0Ijo1NTE2MjM5MDI0fQ.DYGnV6wzq3OyQfOC3zi24z8DY9YceBdHN2MP68kIuyQ":
-    print("jawodjioawdjowia")
 else:
     print("\n\n\n\n nonfosnfoasnfoansodf")
+    
+    
+    
+    
+    
+# token =   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJyaXp6bHlvZ2F3YWJlYXJAZ21haWwuY29tIiwiaWF0Ijo1NTE2MjM5MDI0fQ.uTKGTYSfKOXOSylN9lRo9NOw13DxaZkUSLEzatyNRfM"
+# correct = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJyaXp6bHlvZ2F3YWJlYXJAZ21haWwuY29tIiwiaWF0Ijo1NTE2MjM5MDI0fQ.uTKGTYSfKOXOSylN9lRo9NOw13DxaZkUSLEzatyNRfM"
 
-# encoded_signature = urlsafe_b64encode(str(signature).encode(encoding)).decode(encoding).rstrip('=')
-
-# jwt_token = f'{signature_payload}.{encoded_signature}'
-
-# print(jwt_token)
-
-# resp = {
-#     "token": jwt_token
-# }
-
-
+secret_key = 'your-secret-key'
+signature = hmac.new(bytes(secret_key, encoding), bytes(encoded_header + '.' + encoded_payload, encoding), digestmod=sha256).digest()
+encoded_signature = base64.urlsafe_b64encode(signature).decode().replace("=", "")
+    

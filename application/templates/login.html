@@ -17,5 +17,12 @@
             <input id="password_login" name="password" type="password">
             <button name="button" value="login">Submit</button>
         </form>
+        {% if error %}
+            {% if error == "1" %}
+                <p>Invalid email.</p>
+            {% elif error == "2" %}
+                <p>Invalid password.</p>
+            {% endif %}
+        {% endif %}
     </body>
 </html>
