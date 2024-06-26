@@ -10,7 +10,7 @@ def home_page():
     
     if request.method == 'POST':
         match request.form['home_button']:
-            case 'login': return redirect(url_for('auth.login'))
+            case 'login': return redirect(url_for('users.user_login'))
             case 'users': return redirect(url_for('users.users'))
             case 'chat': return redirect(url_for('chat.chat'))
     

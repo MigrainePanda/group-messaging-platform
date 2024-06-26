@@ -5,15 +5,11 @@ from sqlalchemy import create_engine
 db = SQLAlchemy()
 engine = create_engine("sqlite:///instance/project.db")
 
-from application.routes.auth import auth_bp
 from application.routes.users import users_bp
 from application.routes.chat import chat_bp
 
-from .models import User, ChatLog, Message
-
 def create_app():
     app = Flask(__name__)
-    app.register_blueprint(auth_bp)
     app.register_blueprint(users_bp)
     app.register_blueprint(chat_bp)
 
@@ -24,6 +20,3 @@ def create_app():
         db.create_all()
     
     return app
-
-# run app
-# python -m application

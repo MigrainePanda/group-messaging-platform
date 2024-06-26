@@ -9,7 +9,12 @@
         <link rel="stylesheet" href="">
     </head>
     <body>
+        <h1>Login</h1>
         <form method="post">
+            <label for="email">Email</label>
+            <input id="email_login" name="email" type="email" value={{ email if email else "" }}>
+            <label for="pasword">Password</label>
+            <input id="password_login" name="password" type="password">
             <button name="button" value="login">Submit</button>
         </form>
     </body>
