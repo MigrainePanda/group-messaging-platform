@@ -19,6 +19,9 @@
         <form method="post">
             <button name="user_button" value="create_user">create user</button>
             <button name="user_button" value="login_user">login</button>
+            {% if logged_in %}
+                <button name="user_button" value="logout_user">logout</button>
+            {% endif %}
         </form>
     </body>
 </html>

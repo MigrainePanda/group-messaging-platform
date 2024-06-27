@@ -13,7 +13,6 @@ def home_page():
             case 'login': return redirect(url_for('users.user_login'))
             case 'users': return redirect(url_for('users.users'))
             case 'chat': return redirect(url_for('chat.chat'))
-    
 
 if __name__ == "__main__":
     app.run(debug=True)
