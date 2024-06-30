@@ -7,8 +7,50 @@
         <meta name="description" content="">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <link rel="stylesheet" href="">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js" integrity="sha512-q/dWJ3kcmjBLU4Qc47E4A9kTB4m3wuTY7vkFJDTZKjTs8jhyGQnaUrxa0Ytd0ssMZhbNua9hE+E7Qv1j+DyZwA==" crossorigin="anonymous"></script>
     </head>
     <body>
         <h1>this is the chat page</h1>
+        <section id="before_connect">
+            <label for="username">Username </label>
+            <input type="text" id="username" value=""/>
+            <button id="connect_button">Connect</button>
+        </section>
+
+        <section id="after_connect" style="display:none">
+            <h2>connected</h2>
+            <label for="message_box"></label>
+            <input type="textarea" id="message_box" value=""/>
+            <button id="message_button" value="send">Send</button>
+        </section>
+        
+
+        <script>
+            const username = document.getElementById('username').value;
+            const cookies = document.cookie.split(';').map(item => item.split("="))
+            let jwt = ""
+            for(let i = 0; i < cookies.length; i++) {
+                if(cookies[i][0] === "jwt") {
+                    jwt = cookies[i][1];
+                    break;    
+                }
+            }
+            const socket = io({
+                autoConnect: false,
+                auth: {
+                    "jwt": jwt
+                }
+            });
+            document.getElementById("connect_button").addEventListener("click", function() {
+                
+                socket.connect(jwt);
+                socket.on('connect', function() {
+                    socket.emit('user_join', username);
+                });
+
+                document.getElementById("after_connect").style.display = "block";
+                document.getElementById("before_connect").style.display = "none";
+            });
+        </script>
     </body>
 </html>

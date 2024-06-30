@@ -1,5 +1,6 @@
 from flask import request, url_for, render_template, redirect
 from application import create_app
+from .events import socketio
 
 app = create_app()
 
@@ -15,4 +16,4 @@ def home_page():
             case 'chat': return redirect(url_for('chat.chat'))
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    socketio.run(app)
