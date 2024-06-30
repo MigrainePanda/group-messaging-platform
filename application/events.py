@@ -6,7 +6,8 @@ socketio = SocketIO()
 
 @socketio.on("connect")
 def handle_connect(auth):
-    if "jwt" in auth and is_valid_jwt(request.cookies['jwt']):
+    print(auth)
+    if "jwt" in auth and is_valid_jwt(auth["jwt"]):
         print("client connected")
     else:
         raise ConnectionRefusedError("unauthorized")
@@ -18,4 +19,3 @@ def handle_user_join(username):
 @socketio.on("message")
 def handle_message(data):
     print("message received " + data)
-
