@@ -11,6 +11,8 @@
     </head>
     <body>
         <h1>this is the chat page</h1>
+         <h2>Welcome to Room {{ room_id }}!</h2>
+
         <section id="before_connect">
             <label for="username">Username </label>
             <input type="text" id="username" value=""/>
@@ -27,6 +29,7 @@
 
         <script>
             const username = document.getElementById('username').value;
+            /* 
             const cookies = document.cookie.split(';').map(item => item.split("="))
             let jwt = ""
             for(let i = 0; i < cookies.length; i++) {
@@ -35,16 +38,14 @@
                     break;    
                 }
             }
+            */
             
             const socket = io({
                 autoConnect: false,
-                auth: {
-                    "jwt": jwt
-                }
             });
             document.getElementById("connect_button").addEventListener("click", function() {
                 
-                socket.connect(jwt);
+                socket.connect();
                 socket.on('connect', function() {
                     socket.emit('user_join', username);
                 });

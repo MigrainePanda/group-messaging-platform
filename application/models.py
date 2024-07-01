@@ -23,7 +23,8 @@ class ChatLog(db.Model):
     name: Mapped[str] = mapped_column(String(36))
     date_created = Column(DateTime, default=datetime.now(timezone.utc))
     messages: Mapped[List["Message"]] = relationship()
-    
+    connected_users: Mapped[int] = mapped_column(default=0)
+
 class Message(db.Model):
     __tablename__ = "messages"
 

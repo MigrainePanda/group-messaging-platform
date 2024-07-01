@@ -13,7 +13,8 @@ def home_page():
         match request.form['home_button']:
             case 'login': return redirect(url_for('users.user_login'))
             case 'users': return redirect(url_for('users.users'))
-            case 'chat': return redirect(url_for('chat.chat'))
+            case 'chat': return redirect(url_for('chat.chat_list'))
 
 if __name__ == "__main__":
+    # socketio.run(app, ssl_context=('cert.pem', 'key.pem'))
     socketio.run(app)
