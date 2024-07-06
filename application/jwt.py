@@ -16,7 +16,7 @@ def generate_jwt(user: dict) -> str:
     exp_time = iat_time + 6048000
     
     header = '{"alg":"HS256","typ":"JWT"}'
-    payload = "{" + f'"id":"{user["id"]}","iat":{iat_time}' + "}"
+    payload = "{" + f'"id":"{user["id"]}","iat":{iat_time}, "exp": {exp_time}' + "}"
     
     encoded_header = urlsafe_b64encode(bytes(header, ENCODING)).decode().replace("=", "")
     encoded_payload = urlsafe_b64encode(bytes(payload, ENCODING)).decode().replace("=", "")
