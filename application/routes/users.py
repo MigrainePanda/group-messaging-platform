@@ -10,12 +10,11 @@ from flask import Blueprint, request, url_for, render_template, redirect, make_r
 
 from application import engine
 from application.models import User
-from application.routes.jwt import is_valid_jwt
+from application.jwt import is_valid_jwt, generate_jwt
 
 from sqlalchemy.orm import Session
 from sqlalchemy import select
-
-from .jwt import generate_jwt, is_valid_jwt
+from sqlalchemy.exc import IntegrityError
 
 users_bp = Blueprint("users", __name__, url_prefix="/users")
 
@@ -60,7 +59,7 @@ def create_user():
                 password = request.form["password"],
                 messages = []
             )
-
+            
             session.add(user)
             session.commit()
             
@@ -79,7 +78,7 @@ def user_login():
         error = request.args.get("error")
         return render_template("login.html", email=email, error=error)
     
-    if request.method == "POST":        
+    if request.method == "POST":  
         email = request.form["email"]
         password = request.form["password"] 
         with Session(engine) as session, session.begin():
