@@ -15,6 +15,8 @@ class User(db.Model):
     email: Mapped[str] = mapped_column(String(320), unique=True)
     password: Mapped[str] = mapped_column(String(254))
     messages: Mapped[List["Message"]] = relationship(back_populates="user")
+    current_chat_id = mapped_column(ForeignKey("chatlogs.id"))
+    current_chat: Mapped["ChatLog"] = relationship(back_populates="connected_users")
     
 class ChatLog(db.Model):
     __tablename__ = "chatlogs"
@@ -23,7 +25,7 @@ class ChatLog(db.Model):
     name: Mapped[str] = mapped_column(String(36))
     date_created = Column(DateTime, default=datetime.now(timezone.utc))
     messages: Mapped[List["Message"]] = relationship()
-    connected_users: Mapped[int] = mapped_column(default=0)
+    connected_users: Mapped[List["User"]] = relationship()
 
 class Message(db.Model):
     __tablename__ = "messages"
