@@ -11,47 +11,65 @@
     </head>
     <body>
         <h1>this is the chat page</h1>
-         <h2>Welcome to Room {{ room_id }}!</h2>
+         <h2>Welcome to {{ chatlog["name"] }}!</h2>
 
-        <section id="before_connect">
-            <label for="username">Username </label>
-            <input type="text" id="username" value=""/>
-            <button id="connect_button">Connect</button>
-        </section>
-
-        <section id="after_connect" style="display:none">
-            <h2>connected</h2>
-            <label for="message_box"></label>
-            <input type="textarea" id="message_box" value=""/>
-            <button id="message_button" value="send">Send</button>
-        </section>
+        <div id="messages_container">
+            <ul id="messages_list"></ul>
+        </div>
+        <label for="message_box"></label>
+        <input type="textarea" id="message_box" value=""/>
+        <button id="message_button" value="send">Send</button>
         
-
         <script>
-            const username = document.getElementById('username').value;
-            /* 
             const cookies = document.cookie.split(';').map(item => item.split("="))
             let jwt = ""
             for(let i = 0; i < cookies.length; i++) {
                 if(cookies[i][0] === "jwt") {
                     jwt = cookies[i][1];
-                    break;    
+                    break;
                 }
             }
-            */
             
-            const socket = io({
-                autoConnect: false,
-            });
-            document.getElementById("connect_button").addEventListener("click", function() {
-                
-                socket.connect();
-                socket.on('connect', function() {
-                    socket.emit('user_join', username);
-                });
 
-                document.getElementById("after_connect").style.display = "block";
-                document.getElementById("before_connect").style.display = "none";
+            const socket = io({
+                autoConnect: true,
+                extraHeaders: {
+                    "user-auth": jwt
+                }
+            });
+            socket.on('connect', () => {
+                console.log("Connecting to server")
+            });
+            
+            function handleMessageSend() {
+                let msg_box = document.getElementById("message_box");
+                const msg = msg_box.value;
+                msg_box.value = "";
+                socket.emit('message', msg)
+            }
+
+            document.getElementById("message_box").addEventListener("keyup", (event) => {
+                if (event.key == "Enter") {
+                    handleMessageSend();
+                }
+            });
+            document.getElementById("message_button").addEventListener("click", (event) => {
+                handleMessageSend();
+            });
+
+            // todo fasdklfjasklfjlasdkfjasdkfjklasdjfaskljfklasj
+            // need to check empty message
+            // receive message data payload configure
+
+            socket.on('recieve_message', (data) => {
+                console.log("receive: ", data)
+                // msgs.push(msg);
+                // console.log("msgs: ", msgs)
+                // const msgs_list = document.getElementById("messages_list");
+                // const new_item = document.createElement("li");
+                // new_item.textContent = msgs[msgs.length-1];
+                // new_item.name = "you"
+                // msgs_list.append(new_item);
             });
         </script>
     </body>
