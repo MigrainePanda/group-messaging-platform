@@ -1,6 +1,6 @@
 from flask import request, url_for, render_template, redirect
 from application import create_app
-from .events import socketio
+from .utils.events import socketio
 
 app = create_app()
 

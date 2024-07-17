@@ -10,16 +10,23 @@
         <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js" integrity="sha512-q/dWJ3kcmjBLU4Qc47E4A9kTB4m3wuTY7vkFJDTZKjTs8jhyGQnaUrxa0Ytd0ssMZhbNua9hE+E7Qv1j+DyZwA==" crossorigin="anonymous"></script>
     </head>
     <body>
-        <h1>this is the chat page</h1>
-         <h2>Welcome to {{ chatlog["name"] }}!</h2>
+        <div style="height:90vh">
+            <h1>this is the chat page</h1>
+            <h2>Welcome to {{ chatlog["name"] }}!</h2>
 
-        <div id="messages_container">
-            <ul id="messages_list"></ul>
+            <div id="messages_container">
+                <nav>
+                    <ul id="message_box" style="height:500px; width:40%; overflow:hidden; overflow-y:scroll;"></ul>
+                </nav>
+            </div>
+
+            <div style="padding:10px; width:100%; position:fixed; bottom:5px">
+                <label for="input_box"></label>
+                <textarea style="resize: none; font-size: 20px; width:40%" type="textarea" rows='5' id="input_box" value=""></textarea>
+                <button style="justify-content: center;" id="input_button" value="send">Send</button>
+            </div>
         </div>
-        <label for="message_box"></label>
-        <input type="textarea" id="message_box" value=""/>
-        <button id="message_button" value="send">Send</button>
-        
+
         <script>
             const cookies = document.cookie.split(';').map(item => item.split("="))
             let jwt = ""
@@ -30,11 +37,10 @@
                 }
             }
             
-
             const socket = io({
                 autoConnect: true,
                 extraHeaders: {
-                    "user-auth": jwt
+                    "token": jwt
                 }
             });
             socket.on('connect', () => {
@@ -42,35 +48,43 @@
             });
             
             function handleMessageSend() {
-                let msg_box = document.getElementById("message_box");
+                let msg_box = document.getElementById("input_box");
                 const msg = msg_box.value;
                 msg_box.value = "";
                 socket.emit('message', msg)
             }
-
-            document.getElementById("message_box").addEventListener("keyup", (event) => {
+            document.getElementById("input_box").addEventListener("keyup", (event) => {
                 if (event.key == "Enter") {
                     handleMessageSend();
                 }
             });
-            document.getElementById("message_button").addEventListener("click", (event) => {
+            document.getElementById("input_button").addEventListener("click", (event) => {
                 handleMessageSend();
             });
 
-            // todo fasdklfjasklfjlasdkfjasdkfjklasdjfaskljfklasj
-            // need to check empty message
-            // receive message data payload configure
-
             socket.on('recieve_message', (data) => {
-                console.log("receive: ", data)
-                // msgs.push(msg);
-                // console.log("msgs: ", msgs)
-                // const msgs_list = document.getElementById("messages_list");
-                // const new_item = document.createElement("li");
-                // new_item.textContent = msgs[msgs.length-1];
-                // new_item.name = "you"
-                // msgs_list.append(new_item);
+                
+                const user = data['user']
+                const msg = data['message'].split("\n").join("").split(" ").join("\xa0")
+                const temp = data['message'].split(" ").join("").split("\n").join("")
+                if(temp.length < 1) {
+                    return;
+                }
+                const text = user + ": " + msg + '\n';
+                
+                const msg_box = document.getElementById('message_box');
+                const li = document.createElement('li');
+                li.textContent = text;
+                li.style = "font-size:x-large; font-family: sans-serif; margin-bottom:5px; list-style-type: none"
+                msg_box.append(li);
+                msg_box.scrollTo(0, msg_box.scrollHeight)
             });
+            
+            
+            // textarea.innerHTML += data['user'] + ": " + data['message'];
+            // <div id="messages_container" style="margin: 10px; font-family:sans-serif; font-size: x-large; width:100%; padding:10px">
+            //     <textarea id="message_box" readonly style="resize: none; font-size: 20px; width:40%; border: none;" rows="40"></textarea>
+            // </div>
         </script>
     </body>
 </html>

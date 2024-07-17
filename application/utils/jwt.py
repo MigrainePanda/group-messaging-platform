@@ -62,3 +62,11 @@ def is_valid_jwt(jwt: str) -> bool:
         return False
     # return true if all cases above pass
     return True
+
+def extract_data(jwt: str) -> dict: # only run after token has been validated
+    ENCODING = 'utf-8'
+    jwt = jwt.split(".")
+    payload = urlsafe_b64decode(jwt[1] + "==").decode(ENCODING)
+    response = json.loads(payload)
+    return response
+    

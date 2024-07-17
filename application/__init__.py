@@ -1,8 +1,7 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
+from flask_socketio import SocketIO
 from sqlalchemy import create_engine
-
-from .events import socketio
 
 from dotenv import load_dotenv
 import os
@@ -11,6 +10,7 @@ import os
 load_dotenv()
 
 db = SQLAlchemy()
+socketio = SocketIO()
 engine = create_engine("sqlite:///instance/project.db")
 
 from application.routes.users import users_bp
