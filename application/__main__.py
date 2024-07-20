@@ -11,9 +11,10 @@ def home_page():
     
     if request.method == 'POST':
         match request.form['home_button']:
-            case 'login': return redirect(url_for('users.user_login'))
+            case 'login_user': return redirect(url_for('users.user_login'))
             case 'users': return redirect(url_for('users.users'))
             case 'chat': return redirect(url_for('chat.chat_list'))
+            case 'logout_user': return redirect(url_for('users.user_logout'), code=307)
 
 if __name__ == "__main__":
     # socketio.run(app, ssl_context=('cert.pem', 'key.pem'))

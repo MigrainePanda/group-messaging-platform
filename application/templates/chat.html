@@ -13,7 +13,17 @@
         <div style="height:90vh">
             <h1>this is the chat page</h1>
             <h2>Welcome to {{ chatlog["name"] }}!</h2>
+            
+            <ul>
+                {% for user in chatlog["connected_users"] %}
+                    <li>{{user["username"]}}</li>
+                {% endfor %}
+            </ul>
 
+            <form method="post"> 
+                <button style="justify-content: center;" id="leave_button" name="chatlog_buttons" value="leave">Leave</button>
+            </form>
+            
             <div id="messages_container">
                 <nav>
                     <ul id="message_box" style="height:500px; width:40%; overflow:hidden; overflow-y:scroll;"></ul>
@@ -22,7 +32,7 @@
 
             <div style="padding:10px; width:100%; position:fixed; bottom:5px">
                 <label for="input_box"></label>
-                <textarea style="resize: none; font-size: 20px; width:40%" type="textarea" rows='5' id="input_box" value=""></textarea>
+                <textarea style="resize: none; font-size: 20px; width:40%" type="textarea" rows='2' id="input_box" value=""></textarea>
                 <button style="justify-content: center;" id="input_button" value="send">Send</button>
             </div>
         </div>
@@ -43,27 +53,24 @@
                     "token": jwt
                 }
             });
-            socket.on('connect', () => {
-                console.log("Connecting to server")
-            });
             
-            function handleMessageSend() {
-                let msg_box = document.getElementById("input_box");
-                const msg = msg_box.value;
-                msg_box.value = "";
-                socket.emit('message', msg)
-            }
-            document.getElementById("input_box").addEventListener("keyup", (event) => {
-                if (event.key == "Enter") {
-                    handleMessageSend();
-                }
-            });
-            document.getElementById("input_button").addEventListener("click", (event) => {
-                handleMessageSend();
+            socket.on('connect', () => {
+                console.log("Connected to server");
+                const queryString = window.location.search;
+                const urlParams = new URLSearchParams(queryString)
+                const room_id = urlParams.get('room_id')
+                socket.emit('join_room', {"room_id": room_id.toString()})
             });
 
+            socket.on('disconnect', () => {
+                if(socket.active) {
+                    console.log("Reconnecting...");
+                } else {
+                    console.log("Disconnected.")
+                }
+            })
+
             socket.on('recieve_message', (data) => {
-                
                 const user = data['user']
                 const msg = data['message'].split("\n").join("").split(" ").join("\xa0")
                 const temp = data['message'].split(" ").join("").split("\n").join("")
@@ -78,13 +85,32 @@
                 li.style = "font-size:x-large; font-family: sans-serif; margin-bottom:5px; list-style-type: none"
                 msg_box.append(li);
                 msg_box.scrollTo(0, msg_box.scrollHeight)
+                console.log(msg)
             });
+
+            function handleMessageSend() {
+                let msg_box = document.getElementById("input_box");
+                const msg = msg_box.value;
+                msg_box.value = "";
+                const queryString = window.location.search;
+                const urlParams = new URLSearchParams(queryString)
+                const room_id = urlParams.get('room_id')
+                socket.emit('message', {"msg": msg, "room_id": room_id})
+            }
+            document.getElementById("input_box").addEventListener("keyup", (event) => {
+                if (event.key == "Enter") {
+                    handleMessageSend();
+                }
+            });
+            document.getElementById("input_button").addEventListener("click", (event) => {
+                handleMessageSend();
+            });
+
+            document.getElementById("leave_button").addEventListener("click", (event) => {
+                socket.disconnect();
+            });
+        
             
-            
-            // textarea.innerHTML += data['user'] + ": " + data['message'];
-            // <div id="messages_container" style="margin: 10px; font-family:sans-serif; font-size: x-large; width:100%; padding:10px">
-            //     <textarea id="message_box" readonly style="resize: none; font-size: 20px; width:40%; border: none;" rows="40"></textarea>
-            // </div>
         </script>
     </body>
 </html>
