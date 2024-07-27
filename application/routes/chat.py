@@ -1,5 +1,5 @@
 from flask import Blueprint, request, url_for, render_template, redirect
-from application.utils.query import get_chat_rooms, create_chat_room, get_chat_by_id
+from application.utils.query import get_chat_rooms, create_chat_room, get_chat_by_id, get_connected_users
 
 chat_bp = Blueprint("chat", __name__, url_prefix="/chat")
 
@@ -19,6 +19,12 @@ def chat():
 def chat_list():
     if request.method == "GET":
         chatlogs = get_chat_rooms()
+        connected_users = get_connected_users()
+        for chat in chatlogs:
+            if chat['id'] in connected_users:
+                chat['connected_users'] = connected_users[chat['id']]
+            else:
+                chat['connected_users'] = 0
         return render_template("chat_list.html", chatlogs=chatlogs)
 
     if request.method == "POST":

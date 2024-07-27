@@ -2,7 +2,7 @@ from flask import request
 from flask_socketio import join_room, leave_room
 
 from application.utils.jwt import is_valid_jwt, extract_data
-from application.utils.query import get_user_by_id, add_user_connected, rm_user_connected
+from application.utils.query import get_user_by_id, add_user_connected, rm_user_connected, save_msg
 from application import socketio
 
 
@@ -35,6 +35,7 @@ def handle_message(data):
         user = get_user_by_id(user_id)
         
         socketio.emit('recieve_message', {'user': user['username'], 'message': data["msg"]}, to=data["room_id"])
+        save_msg({ 'user_id': user_id, 'chatlog_id': user['current_chat_id'], 'body': data['msg'] })
         
 @socketio.on('disconnect')
 def handle_disconnect():
