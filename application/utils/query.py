@@ -61,15 +61,14 @@ def check_login(email: str, password: str) -> dict:
     with Session(engine) as session, session.begin():
         try:
             user = session.execute(select(User).filter_by(email=email)).scalar_one()
-            if not user: 
-                return {'error': 1}
-            if user.password != password: 
+            if user.password != password:
+                print("Invalid passw") 
                 return {'error': 2}
             user = user.__dict__    
             return user
         except:
-            print("Unable to search email/password")
-            return {'error': -1}
+            print("Unable to find email")
+            return {'error': 1}
 
 def get_chat_rooms() -> dict:
     with Session(engine) as session, session.begin():
@@ -137,6 +136,7 @@ def add_user_connected(user_id:int , room_id:int) -> bool:
             user = session.execute(select(User).filter_by(id=user_id)).scalar_one()
             user.current_chat = chatlog
             session.commit()
+            return True
         except:
             print("Unable to add chat/user")
             return False
@@ -147,6 +147,32 @@ def rm_user_connected(user_id:int , room_id:int) -> bool:
             user = session.execute(select(User).filter_by(id=user_id)).scalar_one()
             user.current_chat = None
             session.commit()
+            return True
         except:
             print("Unable to remove chat/user")
             return False
+        
+def check_user_in_room(user_id: int) -> bool:
+    with Session(engine) as session, session.begin():
+        try:
+            user = session.execute(select(User).filter_by(id=user_id)).scalar_one()
+            if user.current_chat == None:
+                return False
+            else:
+                return True
+            
+        except:
+            print("Unable to access user")
+            return False
+        
+def get_msgs_by_user_id(user_id: int) -> list:
+    with Session(engine) as session, session.begin():
+        try:
+            msgs = session.execute(select(Message).filter_by(user_id=user_id)).scalars()
+            msgs = [msg.__dict__ for msg in msgs]
+            for msg in msgs:
+                msg['date_sent'] = msg['date_sent'].strftime("%m/%d/%y %H:%M")
+            return msgs
+        except:
+            print("Unable to fetch msgs")
+            return None

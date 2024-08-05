@@ -1,4 +1,4 @@
-from flask import Blueprint, request, url_for, render_template, redirect
+from flask import Blueprint, request, url_for, render_template, redirect, make_response
 from application.utils.query import get_chat_rooms, create_chat_room, get_chat_by_id, get_connected_users
 
 chat_bp = Blueprint("chat", __name__, url_prefix="/chat")
@@ -39,5 +39,6 @@ def chat_list():
                 chatlog = get_chat_by_id(room_id)
                 print(chatlog)
                 return redirect(url_for("chat.chat", room_id=chatlog['id']))
-            
-        
+
+            case 'home':
+                return redirect(url_for("home_page"))

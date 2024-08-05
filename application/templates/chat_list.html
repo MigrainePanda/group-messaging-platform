@@ -11,9 +11,14 @@
   <body>
     <h1>Create a New Chat</h1>
     <form method="post">
+      <button name="chat_button" value="home">Home</button>
+    </form>
+    <br>
+    <form method="post">
       <label for="chatname">New Chat</label>
       <input type="text" id="chatname" name="chatname" pattern=".{3,}" required title="min. 3 characters"/>
       <button name="chat_button" value="new_submit">Submit</button>
+      
     </form>
 
     <h1 style="margin-top:30px">Join a Chat</h1>

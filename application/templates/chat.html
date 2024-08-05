@@ -20,10 +20,9 @@
                 {% endfor %}
             </ul>
 
-            <form method="post"> 
+            <form method="post">
                 <button style="justify-content: center;" id="leave_button" name="chatlog_buttons" value="leave">Leave</button>
             </form>
-            
             <div id="messages_container">
                 <nav>
                     <ul id="message_box" style="height:500px; width:40%; overflow:hidden; overflow-y:scroll;"></ul>
@@ -46,31 +45,43 @@
                     break;
                 }
             }
+
+            const queryString = window.location.search;
+            const urlParams = new URLSearchParams(queryString);
+            const room_id = urlParams.get('room_id');
+            console.log(room_id)
             
             const socket = io({
                 autoConnect: true,
                 extraHeaders: {
-                    "token": jwt
+                    'token': jwt,
+                    'roomid': room_id
                 }
             });
+
+            window.onbeforeunload = function() {
+                socket.emit('leave', {"room_id": socket.room_id})
+            }
             
             socket.on('connect', () => {
                 console.log("Connected to server");
-                const queryString = window.location.search;
-                const urlParams = new URLSearchParams(queryString)
-                const room_id = urlParams.get('room_id')
-                socket.emit('join_room', {"room_id": room_id.toString()})
+                socket.room_id = Number(room_id);
+                socket.emit('join_room', {"room_id": socket.room_id});
             });
 
             socket.on('disconnect', () => {
                 if(socket.active) {
                     console.log("Reconnecting...");
                 } else {
-                    console.log("Disconnected.")
+                    console.log("Disconnecting...")
                 }
             })
 
             socket.on('recieve_message', (data) => {
+                if (!socket.connected) {
+                    console.log("not connected")
+                    return
+                }
                 const user = data['user']
                 const msg = data['message'].split("\n").join("").split(" ").join("\xa0")
                 const temp = data['message'].split(" ").join("").split("\n").join("")
@@ -82,20 +93,21 @@
                 const msg_box = document.getElementById('message_box');
                 const li = document.createElement('li');
                 li.textContent = text;
-                li.style = "font-size:x-large; font-family: sans-serif; margin-bottom:5px; list-style-type: none"
+                li.style = "font-size:x-large; font-family: sans-serif; margin-bottom:5px; list-style-type: none;"
                 msg_box.append(li);
                 msg_box.scrollTo(0, msg_box.scrollHeight)
                 console.log(msg)
             });
 
             function handleMessageSend() {
+                if (!socket.connected) {
+                    console.log("not connected")
+                    return
+                }
                 let msg_box = document.getElementById("input_box");
                 const msg = msg_box.value;
                 msg_box.value = "";
-                const queryString = window.location.search;
-                const urlParams = new URLSearchParams(queryString)
-                const room_id = urlParams.get('room_id')
-                socket.emit('message', {"msg": msg, "room_id": room_id})
+                socket.emit('message', {"msg": msg, "room_id": socket.room_id});
             }
             document.getElementById("input_box").addEventListener("keyup", (event) => {
                 if (event.key == "Enter") {
@@ -107,10 +119,9 @@
             });
 
             document.getElementById("leave_button").addEventListener("click", (event) => {
+                socket.emit('join_room', {"room_id": socket.room_id});
                 socket.disconnect();
             });
-        
-            
         </script>
     </body>
 </html>

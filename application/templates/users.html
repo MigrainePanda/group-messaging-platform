@@ -10,16 +10,25 @@
     </head>
     <body>
         <h1>this is the users page</h1>
+        <p>Currently connected users</p>
         <ul>
             {% for user in users %}
-                <li>{{user['username']}}: {{user['email']}}</li>
+                {% if user.current_chat_id != None %}
+                    <li>{{user['username']}}: Room {{user.current_chat_id}}</li>
+                {% endif %}
             {% endfor %}
         </ul>
         
         <form method="post">
-            <button name="user_button" value="create_user">create user</button>
-            <button name="user_button" value="login_user">login</button>
+            <button name="user_button" value="home">home</button>
+            
+            {% if not logged_in %}
+                <button name="user_button" value="create_user">create new user</button>
+                <button name="user_button" value="login_user">login</button>
+            {% endif %}
+            
             {% if logged_in %}
+                <button name="user_button" value="profile">your profile</button>
                 <button name="user_button" value="logout_user">logout</button>
             {% endif %}
         </form>

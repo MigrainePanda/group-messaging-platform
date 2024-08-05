@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{user.username}}'s Profile</title>
+</head>
+<body>
+  <h1>{{user.username}}</h1>
+  <form method="post">
+    <button name="user_button" value="home">home</button>
+    <button name="user_button" value="chat">chat</button>
+  </form>
+  <h2>Chat History</h2>
+  <ul style="list-style-type: none">
+    {% for msg in messages | reverse %}
+      <li>{{msg['date_sent']}} | {{msg['body']}}</li>
+    {% endfor %}
+  </ul>
+</body>
+</html>

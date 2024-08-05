@@ -10,10 +10,19 @@
     </head>
     <body>
         <form method="post">
-            <button name="home_button" value="login_user">Login</button>
-            <button name="home_button" value="users">User</button>
-            <button name="home_button" value="chat">Chat</button>
-            <button name="home_button" value="logout_user">Logout</button>
+
+
+            {% if not logged_in %}
+                <button name="home_button" value="create_user">create new user</button>
+                <button name="home_button" value="login_user">login</button>
+            {% endif %}
+            
+            {% if logged_in %}
+                <button name="home_button" value="chat">chat</button>
+                <button name="home_button" value="users">users</button>
+                <button name="home_button" value="profile">your profile</button>
+                <button name="home_button" value="logout_user">logout</button>
+            {% endif %}
         </form>
     </body>
 </html>
