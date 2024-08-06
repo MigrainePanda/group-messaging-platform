@@ -57,4 +57,4 @@ def handle_disconnect():
     if user["current_chat_id"] == room_id:
         rm_user_connected(jwt_data['id'], room_id)
         leave_room(room_id)
-        socketio.emit('recieve_message', {'user': "SERVER", 'message': f"{user['username']} has disconnected from the chat."}, to=room_id)
+        socketio.emit('recieve_message', {'user': "SERVER", 'message': f"{user['username']} has left the chat."}, to=room_id)

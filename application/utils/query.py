@@ -91,7 +91,6 @@ def get_connected_users() -> dict:
             ax = {}
             for user in connected_users.all():
                 a = user._mapping
-                print("user: ", a)
                 b = a["current_chat_id"]
                 if (b in ax):
                     ax[b] += 1

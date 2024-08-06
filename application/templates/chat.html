@@ -9,10 +9,9 @@
         <link rel="stylesheet" href="">
         <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js" integrity="sha512-q/dWJ3kcmjBLU4Qc47E4A9kTB4m3wuTY7vkFJDTZKjTs8jhyGQnaUrxa0Ytd0ssMZhbNua9hE+E7Qv1j+DyZwA==" crossorigin="anonymous"></script>
     </head>
-    <body>
+    <body style="font-family: sans-serif">
         <div style="height:90vh">
-            <h1>this is the chat page</h1>
-            <h2>Welcome to {{ chatlog["name"] }}!</h2>
+            <h1>Welcome to <span style="color:rgb(89, 116, 131)">{{ chatlog["name"] }}!</span></h1>
             
             <ul>
                 {% for user in chatlog["connected_users"] %}
@@ -24,15 +23,17 @@
                 <button style="justify-content: center;" id="leave_button" name="chatlog_buttons" value="leave">Leave</button>
             </form>
             <div id="messages_container">
-                <nav>
-                    <ul id="message_box" style="height:500px; width:40%; overflow:hidden; overflow-y:scroll;"></ul>
+                <nav style="min-width:450px; width:40%; max-width:100%">
+                    <ul id="message_box" style="height:500px; width:100%; overflow-y:scroll;"></ul>
                 </nav>
             </div>
 
             <div style="padding:10px; width:100%; position:fixed; bottom:5px">
                 <label for="input_box"></label>
-                <textarea style="resize: none; font-size: 20px; width:40%" type="textarea" rows='2' id="input_box" value=""></textarea>
-                <button style="justify-content: center;" id="input_button" value="send">Send</button>
+                <textarea style="min-width:450px; resize: none; font-size: 20px; width:40%" type="textarea" rows='2' id="input_box" value=""></textarea>
+                <div style="width:100%" >
+                    <button id="input_button" value="send">Send</button>
+                </div>
             </div>
         </div>
 
@@ -88,12 +89,12 @@
                 if(temp.length < 1) {
                     return;
                 }
-                const text = user + ": " + msg + '\n';
+                const text = (user + ": " + msg) + '\n';
                 
                 const msg_box = document.getElementById('message_box');
                 const li = document.createElement('li');
                 li.textContent = text;
-                li.style = "font-size:x-large; font-family: sans-serif; margin-bottom:5px; list-style-type: none;"
+                li.style = "white-space: normal; word-break: break-all; overflow-wrap: break-word; font-size:x-large; font-family: sans-serif; margin-bottom:5px; list-style-type: none;"
                 msg_box.append(li);
                 msg_box.scrollTo(0, msg_box.scrollHeight)
                 console.log(msg)
@@ -119,7 +120,6 @@
             });
 
             document.getElementById("leave_button").addEventListener("click", (event) => {
-                socket.emit('join_room', {"room_id": socket.room_id});
                 socket.disconnect();
             });
         </script>
