@@ -2,7 +2,7 @@
 
 A real-time messaging platform that uses JWT (JSON Web Tokens) for secure user authentication and SocketIO for online conversation.
 
-![chatroom-demo.gif](https://i.postimg.cc/Kz5swdzZ/chatroom-demo.gif)
+![chatroom-demo-optimize.gif](https://i.postimg.cc/m2hb4GHp/chatroom-demo-optimize.gif)
 
 ## Features
 - **Secure Authentication**: Utilizes JWT to securely authenticate users and control access to chat rooms.
