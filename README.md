@@ -36,10 +36,22 @@ Clone the project
   git clone https://github.com/MigrainePanda/group-messaging-platform
 ```
 
-Install dependencies
-
+Install dependencies in a virtual environment
 ```bash
   pip install -r requirements.txt
+```
+
+Create a .env file in the project folder
+```bash
+  └─group-messaging-platform
+    ├─application
+    │  ├─...
+    ├─.env
+    └─...
+```
+Define a 64 byte secret key in .env for hashing
+```Dotenv
+  SECRET_KEY="your secret key"
 ```
 
 Start the server
@@ -48,7 +60,7 @@ Start the server
   python -m application
 ```
 
-Navigate to <http://127.0.0.1:5000> to start chatting!
+Navigate to the given link in the console to start chatting!
 
 ## Authors
 
